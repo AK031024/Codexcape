@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StoryWeaver AI{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <style>
+        /* Ambient Glows & Global Overrides (Preserving the high-end feel) */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 40vw;
+            height: 40vw;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(100px);
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        body::before {
+            top: -10vw;
+            right: -10vw;
+            background: var(--primary);
+        }
+
+        body::after {
+            bottom: -10vw;
+            left: -10vw;
+            background: var(--secondary);
+        }
+
+        /* Navbar Refinement */
+        .navbar {
+            background: rgba(9, 9, 11, 0.7);
+            backdrop-filter: blur(16px);
+            padding: 0.75rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-brand i {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muffled);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover { color: var(--text); }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-left: 1.5rem;
+            border-left: 1px solid var(--border);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--border); 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .nav-user span { display: none; }
+        }
+    </style>
+</head>
+<body>
+    {% if request.endpoint not in ['login', 'signup', 'index', 'project_editor'] %}
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="nav-brand">
+                <i class="fas fa-feather-alt"></i>
+                <span>StoryWeaver</span>
+            </a>
+            <div class="nav-links">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <div class="nav-user">
+                        <span style="font-size: 0.85rem; color: var(--text-muffled);">{{ session.get('username') }}</span>
+                        <a href="{{ url_for('logout') }}" class="btn btn-secondary btn-sm">Logout</a>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('signup') }}" class="btn btn-primary btn-sm">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

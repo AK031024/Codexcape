@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card card">
+        <div class="auth-header">
+            <a href="/" class="auth-logo">
+                <i class="fas fa-feather-alt"></i>
+            </a>
+            <h1>Join StoryWeaver</h1>
+            <p>Start weaving your masterpiece today</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+             Account created! Redirecting...
+        </div>
+        
+        <form id="signupForm" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" name="username" placeholder="Choose a username" required minlength="3">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" name="password" placeholder="Create a password" required minlength="8">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-shield-check"></i>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                <span class="loading-spinner" id="loadingSpinner"></span>
+                <span id="buttonText">Create Account</span>
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-page {
+        min-height: calc(100vh - 70px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 480px;
+        padding: 3.5rem;
+        background: rgba(9, 9, 11, 0.8);
+        border: 1px solid var(--border);
+        box-shadow: 0 32px 64px rgba(0, 0, 0, 0.6);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .auth-logo {
+        display: inline-flex;
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 12px;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        color: white;
+        text-decoration: none;
+    }
+
+    .auth-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+    }
+
+    .auth-header p {
+        color: var(--text-muffled);
+        font-size: 0.95rem;
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muffled);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-dim);
+        font-size: 1rem;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        background: #000;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 0.8rem 1rem 0.8rem 2.8rem;
+        color: var(--text);
+        font-family: inherit;
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+
+    .input-wrapper input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
+    }
+
+    .btn-block {
+        width: 100%;
+        justify-content: center;
+        padding: 0.8rem;
+        margin-top: 1rem;
+    }
+
+    .auth-footer {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--text-muffled);
+    }
+
+    .auth-footer a {
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .loading-spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .success-message {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: var(--accent);
+        padding: 0.75rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+        display: none;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('signupForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const buttonText = document.getElementById('buttonText');
+        const successMessage = document.getElementById('successMessage');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirm) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            loadingSpinner.style.display = 'block';
+            buttonText.textContent = 'Creating...';
+
+            const formData = {
+                username: document.getElementById('username').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: password
+            };
+
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    successMessage.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 1500);
+                } else {
+                    alert(data.error || 'Signup failed');
+                    submitBtn.disabled = false;
+                    loadingSpinner.style.display = 'none';
+                    buttonText.textContent = 'Create Account';
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert('An error occurred during signup.');
+                submitBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+                buttonText.textContent = 'Create Account';
+            }
+        });
+    });
+</script>
+{% endblock %}

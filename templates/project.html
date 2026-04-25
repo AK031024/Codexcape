@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="editor-container">
+    <!-- Sophisticated Header -->
+    <header class="editor-nav">
+        <div class="nav-left">
+            <a href="{{ url_for('dashboard') }}" class="btn-back">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <div class="project-info">
+                <input type="text" id="projectTitle" value="{{ project.title }}" class="editor-title-input" placeholder="Untitled Story">
+                <div class="editor-meta">
+                    <span class="meta-tag"><i class="fas fa-feather"></i> <span id="wordCounter">0</span> words</span>
+                    <span class="meta-tag"><i class="fas fa-clock"></i> <span id="timeEstimate">0 min</span> read</span>
+                    <span class="save-status" id="saveStatus"><i class="fas fa-cloud"></i> Synced</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-right">
+            <div class="genre-pill">
+                <select id="projectGenre" class="editor-genre-select">
+                    <option value="fantasy" {% if project.genre == 'fantasy' %}selected{% endif %}>Fantasy</option>
+                    <option value="sci-fi" {% if project.genre == 'sci-fi' %}selected{% endif %}>Sci-Fi</option>
+                    <option value="mystery" {% if project.genre == 'mystery' %}selected{% endif %}>Mystery</option>
+                    <option value="romance" {% if project.genre == 'romance' %}selected{% endif %}>Romance</option>
+                    <option value="thriller" {% if project.genre == 'thriller' %}selected{% endif %}>Thriller</option>
+                    <option value="historical" {% if project.genre == 'historical' %}selected{% endif %}>Historical</option>
+                    <option value="general" {% if project.genre == 'general' %}selected{% endif %}>General</option>
+                </select>
+            </div>
+            <button onclick="saveProject()" class="btn btn-primary btn-sm">
+                <i class="fas fa-save"></i> Save
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-ghost btn-icon">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="dropdown-content card">
+                    <a href="#" onclick="exportProject()"><i class="fas fa-file-export"></i> Export Markdown</a>
+                    <a href="#" onclick="printProject()"><i class="fas fa-print"></i> Print View</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="editor-layout">
+        <!-- Floating AI Command Center -->
+        <aside class="ai-side-panel card">
+            <div class="panel-header">
+                <h3><i class="fas fa-sparkles"></i> AI Assistant</h3>
+                <button class="btn-toggle-ai" onclick="toggleAIPanel()">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+            
+            <div class="ai-tools-list" id="aiTools">
+                <button class="ai-action-card" onclick="suggestImprovements()">
+                    <div class="action-icon"><i class="fas fa-magic"></i></div>
+                    <div class="action-info">
+                        <strong>Improve Style</strong>
+                        <span>Enhance prose & flow</span>
+                    </div>
+                </button>
+                
+                <button class="ai-action-card" onclick="generateNextParagraph()">
+                    <div class="action-icon"><i class="fas fa-arrow-right"></i></div>
+                    <div class="action-info">
+                        <strong>Continue Story</strong>
+                        <span>Predict next scene</span>
+                    </div>
+                </button>
+                
+                <button class="ai-action-card" onclick="fixGrammar()">
+                    <div class="action-icon"><i class="fas fa-spell-check"></i></div>
+                    <div class="action-info">
+                        <strong>Fix Grammar</strong>
+                        <span>Polishing & edits</span>
+                    </div>
+                </button>
+                
+                <button class="ai-action-card" onclick="showInspiration()">
+                    <div class="action-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="action-info">
+                        <strong>Inspiration</strong>
+                        <span>Plot twists & ideas</span>
+                    </div>
+                </button>
+            </div>
+
+            <div class="panel-section">
+                <span class="section-label">Quick Add</span>
+                <div class="quick-add-grid">
+                    <button class="btn-tool" onclick="insertCharacter()" title="Insert Character Tag"><i class="fas fa-user-plus"></i></button>
+                    <button class="btn-tool" onclick="insertLocation()" title="Insert Location Tag"><i class="fas fa-map-marker-alt"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Zen Editor -->
+        <main class="zen-editor-wrapper">
+            <div class="editor-canvas">
+                <div class="formatting-toolbar card">
+                    <button class="btn-format" onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
+                    <button class="btn-format" onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
+                    <div class="toolbar-divider"></div>
+                    <span id="pageCount" class="page-indicator">Page 1</span>
+                </div>
+                
+                <textarea id="projectContent" placeholder="Once upon a time..." spellcheck="false">{{ project.content }}</textarea>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Inspiration Modal -->
+<div id="inspirationModal" class="modal">
+    <div class="modal-content card">
+        <div class="modal-header">
+            <h3><i class="fas fa-wand-magic-sparkles"></i> AI Narrative Forge</h3>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="inspiration-grid">
+                <div class="inspiration-card active">
+                    <div class="card-tag">CONTINUATION</div>
+                    <p id="continuationIdea">Deep in the heart of the ancient forest, the shadows began to weave their own stories...</p>
+                    <button class="btn btn-primary btn-sm" onclick="useContinuation()">Apply Idea</button>
+                </div>
+                <div class="inspiration-card">
+                    <div class="card-tag">PLOT TWIST</div>
+                    <p id="plotTwistIdea">What if the guide they trusted was actually the villain in disguise?</p>
+                    <button class="btn btn-secondary btn-sm" onclick="usePlotTwist()">Take This Path</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .editor-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background: var(--bg);
+        overflow: hidden;
+    }
+
+    /* Header Styling */
+    .editor-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 2rem;
+        background: rgba(9, 9, 11, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        z-index: 100;
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 1.5rem; flex: 1; }
+    .btn-back { 
+        color: var(--text-dim); 
+        font-size: 1.1rem; 
+        width: 36px; 
+        height: 36px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        border-radius: 50%;
+        transition: var(--transition);
+    }
+    .btn-back:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+
+    .project-info { display: flex; flex-direction: column; gap: 0.25rem; }
+    .editor-title-input {
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 0;
+        width: 100%;
+        outline: none;
+        font-family: var(--font-display);
+    }
+
+    .editor-meta { display: flex; align-items: center; gap: 1rem; }
+    .meta-tag { font-size: 0.75rem; color: var(--text-dim); display: flex; align-items: center; gap: 0.4rem; }
+    .save-status { font-size: 0.75rem; color: var(--accent); display: flex; align-items: center; gap: 0.4rem; opacity: 0.8; }
+
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .editor-genre-select {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border);
+        border-radius: 50px;
+        color: var(--text-muffled);
+        font-size: 0.8rem;
+        padding: 0.4rem 1rem;
+        outline: none;
+    }
+
+    /* Layout */
+    .editor-layout {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* AI Side Panel */
+    .ai-side-panel {
+        width: 320px;
+        margin: 1.5rem;
+        background: rgba(9, 9, 11, 0.4);
+        display: flex;
+        flex-direction: column;
+        z-index: 10;
+        height: fit-content;
+        max-height: calc(100vh - 120px);
+    }
+
+    .panel-header {
+        padding: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .panel-header h3 { font-size: 0.95rem; font-weight: 700; color: var(--primary-light); display: flex; align-items: center; gap: 0.75rem; }
+    .btn-toggle-ai { background: transparent; border: none; color: var(--text-dim); cursor: pointer; }
+
+    .ai-tools-list { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    
+    .ai-action-card {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        text-align: left;
+        cursor: pointer;
+        transition: var(--transition);
+        width: 100%;
+        color: inherit;
+    }
+
+    .ai-action-card:hover { 
+        background: rgba(139, 92, 246, 0.08); 
+        border-color: var(--primary);
+        transform: translateX(4px);
+    }
+
+    .action-icon { width: 36px; height: 36px; background: rgba(139, 92, 246, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary-light); }
+    .action-info { display: flex; flex-direction: column; }
+    .action-info strong { font-size: 0.85rem; font-weight: 600; }
+    .action-info span { font-size: 0.75rem; color: var(--text-dim); }
+
+    .panel-section { padding: 1.25rem; border-top: 1px solid var(--border); }
+    .section-label { display: block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1rem; }
+    
+    .quick-add-grid { display: flex; gap: 0.75rem; }
+    .btn-tool {
+        width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); color: var(--text-muffled); cursor: pointer; transition: var(--transition);
+    }
+    .btn-tool:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* Zen Editor */
+    .zen-editor-wrapper {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        overflow-y: auto;
+        padding: 4rem 2rem;
+    }
+
+    .editor-canvas {
+        width: 100%;
+        max-width: 800px;
+        position: relative;
+    }
+
+    .formatting-toolbar {
+        position: sticky;
+        top: 0;
+        margin-bottom: 2rem;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+        background: rgba(9, 9, 11, 0.6);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-format { 
+        width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: none; background: transparent; color: var(--text-muffled); cursor: pointer;
+    }
+    .btn-format:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    .toolbar-divider { width: 1px; height: 20px; background: var(--border); margin: 0 0.5rem; }
+    .page-indicator { font-size: 0.75rem; color: var(--text-dim); font-weight: 600; }
+
+    #projectContent {
+        width: 100%;
+        min-height: 800px;
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-size: 1.25rem;
+        line-height: 2;
+        font-family: 'Playfair Display', serif;
+        outline: none;
+        resize: none;
+        padding-bottom: 20vh;
+    }
+
+    /* Modal Styling */
+    .inspiration-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+    .inspiration-card { 
+        padding: 1.5rem; 
+        background: rgba(255,255,255,0.02); 
+        border-radius: var(--radius-md); 
+        border: 1px solid var(--border);
+        transition: var(--transition);
+    }
+    .inspiration-card.active { border-color: var(--primary); background: rgba(139, 92, 246, 0.05); }
+    .card-tag { font-size: 0.65rem; font-weight: 800; color: var(--primary-light); margin-bottom: 1rem; letter-spacing: 0.1em; }
+    .inspiration-card p { line-height: 1.6; color: var(--text-muffled); margin-bottom: 1.5rem; font-style: italic; }
+
+    @media (max-width: 1100px) {
+        .ai-side-panel { display: none; }
+        .zen-editor-wrapper { padding: 2rem 1rem; }
+    }
+</style>
+
+<script>
+    let projectId = {{ project.id }};
+    let autoSaveTimer;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateWordCount();
+        setupAutoSave();
+        
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveProject();
+            }
+        });
+
+        // Sync cursor for better writing experience
+        const editor = document.getElementById('projectContent');
+        editor.focus();
+    });
+
+    function updateWordCount() {
+        const content = document.getElementById('projectContent').value;
+        const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+        const characters = content.length;
+        
+        document.getElementById('wordCounter').textContent = words.toLocaleString();
+        document.getElementById('pageCount').textContent = 'Page ' + Math.ceil(words / 250);
+        document.getElementById('timeEstimate').textContent = Math.ceil(words / 200) + ' min';
+    }
+
+    function setupAutoSave() {
+        const contentArea = document.getElementById('projectContent');
+        contentArea.addEventListener('input', function() {
+            updateWordCount();
+            document.getElementById('saveStatus').innerHTML = '<i class="fas fa-sync fa-spin"></i> Saving...';
+            document.getElementById('saveStatus').style.color = 'var(--text-dim)';
+            
+            if (autoSaveTimer) clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(saveProject, 3000);
+        });
+    }
+
+    async function saveProject() {
+        const title = document.getElementById('projectTitle').value;
+        const genre = document.getElementById('projectGenre').value;
+        const content = document.getElementById('projectContent').value;
+        
+        try {
+            const response = await fetch(`/api/projects/${projectId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, genre, content })
+            });
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('saveStatus').innerHTML = '<i class="fas fa-cloud"></i> Synced';
+                document.getElementById('saveStatus').style.color = 'var(--accent)';
+            }
+        } catch (error) {
+            document.getElementById('saveStatus').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Offline';
+            document.getElementById('saveStatus').style.color = 'var(--secondary)';
+        }
+    }
+
+    function toggleAIPanel() {
+        const aiTools = document.getElementById('aiTools');
+        const icon = document.querySelector('.btn-toggle-ai i');
+        if (aiTools.style.display === 'none') {
+            aiTools.style.display = 'flex';
+            icon.className = 'fas fa-minus';
+        } else {
+            aiTools.style.display = 'none';
+            icon.className = 'fas fa-plus';
+        }
+    }
+
+    async function aiRequest(endpoint, body) {
+        showNotification('AI is thinking...', 'info');
+        try {
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            return await res.json();
+        } catch(e) { 
+            showNotification('AI service unavailable', 'error');
+            return null;
+        }
+    }
+
+    async function suggestImprovements() {
+        const content = document.getElementById('projectContent').value;
+        if (!content.trim()) return;
+        const data = await aiRequest('/api/generate-idea', { genre: 'editing' }); // Mocked for simplicity
+        if(data) {
+            document.getElementById('continuationIdea').textContent = data.idea;
+            showInspiration();
+        }
+    }
+
+    async function generateNextParagraph() {
+        const content = document.getElementById('projectContent').value;
+        const data = await aiRequest('/api/generate-inspiration', { type: 'prompt' });
+        if(data) {
+            document.getElementById('continuationIdea').textContent = data.inspiration;
+            showInspiration();
+        }
+    }
+
+    function showInspiration() {
+        document.getElementById('inspirationModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('inspirationModal').style.display = 'none';
+    }
+
+    function formatText(command) {
+        document.execCommand(command, false, null);
+    }
+
+    function insertCharacter() {
+        const name = prompt('Character Name:');
+        if (name) insertAtCursor(`[CHARACTER: ${name}] `);
+    }
+
+    function insertLocation() {
+        const name = prompt('Location Name:');
+        if (name) insertAtCursor(`[LOCATION: ${name}] `);
+    }
+
+    function insertAtCursor(text) {
+        const textarea = document.getElementById('projectContent');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        textarea.value = textarea.value.substring(0, start) + text + textarea.value.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + text.length;
+        updateWordCount();
+        saveProject();
+    }
+
+    function exportProject() {
+        const title = document.getElementById('projectTitle').value;
+        const content = document.getElementById('projectContent').value;
+        const blob = new Blob([`# ${title}\n\n${content}`], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${title.replace(/\s+/g, '_')}.md`;
+        a.click();
+    }
+
+    function printProject() {
+        window.print();
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('inspirationModal');
+        if (event.target === modal) closeModal();
+    }
+</script>
+{% endblock %}
+%}

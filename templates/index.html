@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% block content %} 
+
+<div class="landing">
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-badge">
+                <i class="fas fa-sparkles"></i>
+                <span>Now powered by Gemini 3.0</span>
+            </div>
+            <h1>The Intelligent Workspace for <span class="gradient-text">World Builders</span></h1>
+            <p>StoryWeaver is the next-generation creative companion designed to amplify your imagination. Craft complex lore, develop deep characters, and weave intricate plots in a beautiful, distraction-free environment.</p>
+            <div class="hero-actions">
+                {% if session.user_id %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                        Go to Dashboard <i class="fas fa-arrow-right"></i>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('signup') }}" class="btn btn-primary btn-lg">
+                        Start Writing Free <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary btn-lg">
+                        Sign In
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid (Bento Style) -->
+    <section class="features">
+        <div class="page-container">
+            <div class="section-header">
+                <h2>Engineered for Creativity</h2>
+                <p>Every tool you need to bring your vision to life, refined for the modern writer.</p>
+            </div>
+            <div class="bento-grid">
+                <div class="bento-item main-feature card">
+                    <i class="fas fa-brain"></i>
+                    <h3>AI Collaboration</h3>
+                    <p>Our contextual AI understands your world's logic, suggesting developments that feel consistent with your unique voice and established lore.</p>
+                </div>
+                <div class="bento-item card">
+                    <i class="fas fa-quill-pen"></i>
+                    <h3>World Forge</h3>
+                    <p>Build comprehensive lore, cultures, and histories with structured database tools that maintain internal consistency.</p>
+                </div>
+                <div class="bento-item card">
+                    <i class="fas fa-users-viewfinder"></i>
+                    <h3>Character Casting</h3>
+                    <p>Develop multi-dimensional characters with deep psychological profiles and unique speech patterns.</p>
+                </div>
+                <div class="bento-item card">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <h3>Instant Inspire</h3>
+                    <p>Break through writer's block with AI-generated prompts, plot twists, and sensory details tailored to your scene.</p>
+                </div>
+                <div class="bento-item card">
+                    <i class="fas fa-shield-halved"></i>
+                    <h3>Private & Secure</h3>
+                    <p>Your work is yours. We ensure your creative intellectual property is protected with enterprise-grade encryption.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="social-proof">
+        <p>TRUSTED BY THOUSANDS OF STORYTELLERS</p>
+        <div class="testimonial-row">
+            <div class="testimonial card">
+                <p>"The only AI tool that actually feels like a collaborative partner, not just a generator. It respects my voice."</p>
+                <div class="user">
+                    <span>A.J. Sterling</span>
+                    <small>Fantasy Novelist</small>
+                </div>
+            </div>
+            <div class="testimonial card">
+                <p>"StoryWeaver changed how I organize my world lore. It's like having a dedicated editor and researcher in my pocket."</p>
+                <div class="user">
+                    <span>Elena Vance</span>
+                    <small>Screenwriter</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="card cta-box">
+            <h2>Ready to weave your masterpiece?</h2>
+            <p>Join the future of creative writing today. No credit card required to start.</p>
+            <a href="{{ url_for('signup') }}" class="btn btn-primary btn-lg">Create Your Account</a>
+        </div>
+    </section>
+</div>
+
+<style>
+    .landing { padding-bottom: 6rem; }
+
+    /* Hero */
+    .hero {
+        padding: 8rem 2rem 6rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .hero-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 1rem;
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 50px;
+        color: var(--primary-light);
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        animation: fadeIn 1s ease;
+    }
+
+    .hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 4.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        color: var(--text);
+    }
+
+    .hero p {
+        font-size: 1.25rem;
+        color: var(--text-muffled);
+        margin-bottom: 3rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+    }
+
+    .btn-lg {
+        padding: 0.8rem 2.5rem;
+        font-size: 1rem;
+    }
+
+    /* Bento Grid */
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-header h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .section-header p {
+        color: var(--text-muffled);
+        font-size: 1.1rem;
+    }
+
+    .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, auto);
+        gap: 1.5rem;
+    }
+
+    .bento-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: flex-start;
+        padding: 2.5rem;
+        min-height: 240px;
+    }
+
+    .bento-item i {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+    }
+
+    .bento-item h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .bento-item p {
+        color: var(--text-muffled);
+        font-size: 0.95rem;
+    }
+
+    .main-feature {
+        grid-column: span 2;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 0, 0, 0));
+        border-color: rgba(139, 92, 246, 0.2);
+    }
+
+    /* Social Proof */
+    .social-proof {
+        padding: 8rem 0;
+        text-align: center;
+    }
+
+    .social-proof > p {
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.2em;
+        color: var(--text-dim);
+        margin-bottom: 3rem;
+    }
+
+    .testimonial-row {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .testimonial {
+        max-width: 400px;
+        text-align: left;
+        padding: 2rem;
+    }
+
+    .testimonial p {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        font-style: italic;
+        margin-bottom: 1.5rem;
+    }
+
+    .testimonial .user {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .testimonial .user span { font-weight: 600; }
+    .testimonial .user small { color: var(--text-dim); }
+
+    /* Final CTA */
+    .final-cta {
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+
+    .cta-box {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 4rem;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(217, 70, 239, 0.05));
+    }
+
+    .cta-box h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+    .cta-box p { color: var(--text-muffled); margin-bottom: 2rem; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1024px) {
+        .hero h1 { font-size: 3.5rem; }
+        .bento-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+        .hero h1 { font-size: 2.75rem; }
+        .bento-grid { grid-template-columns: 1fr; }
+        .main-feature { grid-column: span 1; }
+        .hero-actions { flex-direction: column; }
+    }
+</style>
+
+{% endblock %}
+lock %}

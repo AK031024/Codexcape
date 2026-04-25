@@ -1,0 +1,22 @@
+version: "1.0"
+application: "StoryWeaver AI"
+description: "AI-powered writing assistant"
+
+features:
+  voice_adaptation: true
+  real_time_suggestions: true
+  project_management: true
+  export_formats:
+    - "pdf"
+    - "docx"
+    - "txt"
+
+ui:
+  theme: "dark"
+  font_family: "Arial, sans-serif"
+  default_editor_mode: "distraction_free"
+
+security:
+  session_timeout: 3600
+  password_min_length: 8
+  require_email_verification: false

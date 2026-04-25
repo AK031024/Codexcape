@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
+    <div class="card" style="text-align: center; padding: 4rem; max-width: 500px;">
+        <h1 class="gradient-text" style="font-size: 5rem; line-height: 1;">500</h1>
+        <h2 style="margin-bottom: 1.5rem;">The Arcane Engine Stalled</h2>
+        <p style="margin-bottom: 2rem;">Something went wrong on our end. Our storysmiths are already working to fix the cosmic imbalance.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-sm">Try Again</a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-sm">Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
